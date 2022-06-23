@@ -47,8 +47,9 @@
                {{else}}
               <a class="btn" style="color: #FE4E30;background-color:#F4F3F3;border:1px solid #FE4E30;margin-right: 8px;" href="/login" role="button">Login</a>
               <a class="btn" style="color: #F4F3F3;background-color:#FE4E30;margin-right: 8px;" href="/register" role="button">Signup</a>
-              {{/if}}
               <a class="btn" style="color: white;background-color:#111727;" href="/contact" role="button">Contact Me</a>
+              {{/if}}
+              
           </div>
 
 
@@ -142,12 +143,12 @@
                             {{#if this.isCSS}}<i class="fa-brands fa-css3-alt"></i>{{/if}}
                         </div>
      
-                          {{#if isLogin}}
-                         <div class="project-buttons" >
+                          
+                       {{#if this.isLogin}}  <div class="project-buttons" >
                              <a href="/editproject/{{this.id}}"><button class="edit-btn">Edit</button></a>
                              <a href="/deletemyproject/{{this.id}}"><button class="delete-btn">Delete</button></a>
-                         </div>
-                         {{/if}}
+                         </div> {{/if}}
+                         
                  </div>
                      
             </div>
@@ -171,6 +172,8 @@
            function movePost(id){
            window.location.href = `http://localhost:80/single/${id}`;
             }; 
+
+           
 
 
     </script>

@@ -45,8 +45,9 @@
                {{else}}
               <a class="btn" style="color: #FE4E30;background-color:#F4F3F3;border:1px solid #FE4E30;margin-right: 8px;" href="/login" role="button">Login</a>
               <a class="btn" style="color: #F4F3F3;background-color:#FE4E30;margin-right: 8px;" href="/register" role="button">Signup</a>
-              {{/if}}
               <a class="btn" style="color: white;background-color:#111727;" href="/contact" role="button">Contact Me</a>
+              {{/if}}
+             
           </div>
 
 
@@ -63,19 +64,26 @@
             <!--  Name -->
             <div class="mb-4" >
               <label for="username" class="form-label mb-1">Username</label>
-              <input type="text" class="form-control" id="username" name="username">
+              <input type="text" class="form-control" id="username" name="username" value={{username}}>
             </div>
 
             <!-- Email -->
             <div class="mb-4">
               <label for="email" class="form-label mb-1">Email</label>
-              <input type="text" class="form-control" id="email" name="email">
+              
+              {{#if emailError}}
+                             <input type="text" class="form-control error-input" id="email" name="email" value={{email}}>
+              {{else}}
+              <input type="text" class="form-control" id="email" name="email" value={{email}}>
+              {{/if}}
+
+              {{#if emailError}} <p class="error-message">{{emailError}}</p> {{/if}}
             </div>
 
             <!-- Password -->
             <div class="mb-4">
               <label for="password" class="form-label mb-1">Password</label>
-              <input type="password" class="form-control" id="password" name="password">
+              <input type="password" class="form-control" id="password" name="password" value={{password}}>
             </div>
 
             <!-- Submit Button -->

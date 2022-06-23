@@ -13,6 +13,7 @@ const {getDuration} = require("./helpers/index");
 const {getDateStringFormat} = require("./helpers/index")
 
 
+app.use(flash());
 // Url encoded middleware
 app.use(express.urlencoded({extended:false}));
 
@@ -32,10 +33,10 @@ app.use(session({
     }
 }))
 
-app.use((req,res,next)=>{
-    console.log(req.session);
-    next();
-})
+// app.use((req,res,next)=>{
+//     console.log(req.session);
+//     next();
+// })
 
 
 // Connect
@@ -45,23 +46,33 @@ db.connect(function(err,client,done){
 
 // REGISTER
 app.get("/register", alreadyLogin, (req,res)=>{
-    res.render("register",{isLogin:req.body.isLogin})
+    res.render("register",{isLogin:req.session.isLogin})
 })
 
 app.post("/register",(req,res)=>{
     const {email,password,username} = req.body;
-
     const hashedPassword = bcrypt.hashSync(password,10);
+
+    client.query(`SELECT * FROM public.users WHERE email=$1`,[email], (err,result)=>{
+        // Check email
+        if(result.rows.length != 0){
+            return res.render("register",  {emailError:"Email is already registered",email,password,username} )
+        } 
     
-    client.query(`INSERT INTO public.users("username", "email", "password")
+        // Insert Password
+        client.query(`INSERT INTO public.users("username", "email", "password")
     VALUES ($1, $2, $3)`, [username, email, hashedPassword] , (err,result)=>{
         if(err) throw err;
         res.redirect("/login");; })
+    })
+
+    
+    
 })
 
 // LOGIN 
 app.get("/login", alreadyLogin,(req,res)=>{
-    res.render("login",{isLogin:req.body.isLogin});
+    res.render("login",{isLogin:req.session.isLogin});
 })
 
 app.post("/login", (req,res)=>{
@@ -70,14 +81,16 @@ app.post("/login", (req,res)=>{
      client.query(`SELECT * FROM public.users WHERE email=$1`,[email], (err,result)=>{
         let user = result.rows[0];
  
+        // Check email sudah terdaftar atau tidak
         if(result.rows.length == 0){
-            return res.redirect("/login")
+            return res.render("login",  {emailError:"Email not yet registered",email,password})
         }
 
         const isMatch = bcrypt.compareSync(password,user.password);
 
+        // Check apakah password udah benar
         if(!isMatch) {
-              req.flash("danger","Password salah")
+              return res.render("login", {pwError:"Wrong password",email,password})
         } else {
             req.session.isLogin = true;
             req.session.user = {
@@ -111,12 +124,17 @@ app.get("/" , (req,res)=> {
     if(err) throw err;
    
     
-    client.query("SELECT * FROM public.projects", (err,result)=>{
+    client.query("SELECT * FROM public.projects ORDER BY id DESC", (err,result)=>{
         if(err) throw err;
 
         let data = result.rows;
+        data = data.map((item)=>{
+            return {
+                ...item,isLogin:req.session.isLogin
+            }
+        })
         const isPostNotThere = data.length == 0 ? true : false;
-        res.render("home",{data:data,isPostNotThere,isLogin:req.body.isLogin})
+        res.render("home",{data:data,isPostNotThere,isLogin:req.session.isLogin})
         
     })
 
@@ -131,7 +149,7 @@ app.get("/single/:id",(req,res)=>{
 
     client.query(`SELECT * FROM public.projects WHERE id=${id}`, (err,result)=>{
         let data = result.rows[0];
-        res.render("single",{data:data,isLogin:req.body.isLogin})
+        res.render("single",{data:data,isLogin:req.session.isLogin})
         
     });
 
@@ -139,11 +157,11 @@ app.get("/single/:id",(req,res)=>{
 
 
 app.get("/addmyproject",checkLogin,(req,res)=>{
-    res.render("addproject",{isLogin:req.body.isLogin})    
+    res.render("addproject",{isLogin:req.session.isLogin})    
 });
 
 app.get("/contact",(req,res)=>{
-    res.render("contact",{isLogin:req.body.isLogin})
+    res.render("contact",{isLogin:req.session.isLogin})
 });
 
 // POST
@@ -194,7 +212,7 @@ app.get("/editproject/:id", checkLogin , (req,res)=>{
         if(err) throw err;
 
         let data = result.rows[0];
-        res.render("editproject",{dataToEdit:data,isLogin:req.body.isLogin})
+        res.render("editproject",{dataToEdit:data,isLogin:req.session.isLogin})
     });
        
 

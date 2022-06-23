@@ -516,3 +516,16 @@ section{
   color: white;
   transform: scale(1.1);
 }
+
+
+
+
+                                   /* SPECIAL CLASSES */
+.error-message{
+   color: red;
+   font-size: 10px;
+};
+
+.error-input{
+  border: 1px solid red o !important;
+};
