@@ -33,11 +33,6 @@ app.use(session({
     }
 }))
 
-// app.use((req,res,next)=>{
-//     console.log(req.session);
-//     next();
-// })
-
 
 // Connect
 db.connect(function(err,client,done){
